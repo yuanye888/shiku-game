@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>视酷后台管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a>首页</a>
+            <a>群组管理</a>
+            <a><cite>成员管理</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+
+    <a class="layui-btn layui-btn-small layui-btn-normal" style="line-height:1.6em;margin-top:3px;float:right"
+       onclick="history.go(-1);" title="返回">
+        <i class="layui-icon layui-icon-return" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>多选移除群成员
+                    </button>
+                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>多选删除群成员
+                    </button>
+                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>导出成员
+                    </button>
+                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>邀请加入群组
+                    </button>
+                </div>
+                <div class="layui-card-body layui-table-body layui-table-main">
+                    <table class="layui-table layui-form" id="roomUsermanagerTable">
+                    </table>
+                </div>
+                <div>
+                    <p th:hidden="true" th:text="${room_id}" id = "roomId"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/html" id="roomMemberListBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">移除</a>
+</script>
+<script type="text/javascript" src="js/timeFormat.js"></script>
+<script src="js/md5.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script>
+    /*加载聊天记录列表*/
+    layui.use('table', function () {
+        let time = parseInt(Math.round(new Date().getTime())) + parseInt($.cookie("currentTime"));
+        time = parseInt(time / 1000);
+        var sign = hex_md5($.cookie("apiKey") + time + $.cookie("account") + $.cookie("access_Token"));
+        var table = layui.table;
+        table.render({
+            elem: '#roomUsermanagerTable'
+            , url: '/shikuRoom/selectAllRoomUsermanager'
+            , where: {
+                "token": $.cookie("access_Token"),
+                "userId": $.cookie("account"),
+                "sysId": "",
+                "sign": sign,
+                "time": time,
+                "reqData": {"roomId":$('#roomId').html()}
+            }
+            , contentType: "application/json;charset=utf-8"
+            , dataType: "JSON"
+            , method: "POST"
+            , parseData: function (res) {
+                return {
+                    "code": res.repCode,
+                    "msg": res.repMsg,
+                    "count": res.repData.count,
+                    "data": res.repData.data
+                }
+            },
+            response: {
+                statusCode: "0000" //重新规定成功的状态码为 200，table 组件默认为 0
+            }
+            , cols: [
+                [
+                    {field: 'userId', width: 280, title: '成员UserId'}
+                    , {field: 'nickname', width: 220, title: '成员昵称'}
+                    , {field: 'role', width: 120, title: '成员角色', templet: function (r) {
+                        return roleType(r.role);
+                    }}
+                    , {field: 'offlineNoPushMsg', width: 120, title: '是否屏蔽消息',templet: function (o) {
+                        return (o.offlineNoPushMsg==0?"否":"是");
+                    }}
+                    , {field: 'createTime', title: '加入时间',templet: function (t) {
+                        return timeFormat(t.createTime, "yyyy-mm-dd hh:mm:ss");
+                        }
+                    }
+                    ,{fixed: 'right',title:"操作", align:'left', toolbar: '#roomMemberListBar'}
+                ]
+            ]
+            , page: true
+            , limits: [10, 50, 100, 200]  //每页条数的选择项，默认：[10,20,30,40,50,60,70,80,90]。
+            , limit: 10 //每页默认显示的数量
+        });
+        // 执行搜索，表格重载
+        $('#do_search').click(function () {
+            table.reload('groupchatlogsTable', {
+                method: 'post'
+                , where: {
+                    "token": $.cookie("access_Token"),
+                    "userId": $.cookie("account"),
+                    "sysId": "",
+                    "sign": sign,
+                    "time": time,
+                    "reqData": {"keyWord": $('#keyWord').val()}
+                }
+                , page: {
+                    curr: 1
+                }
+            });
+        });
+
+        // 操作
+        table.on('tool(demo)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                layer.msg('ID：' + data.id + ' 的查看操作');
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    // $.ajax({
+                    //     url: '/shikuRoom/deleteShikuRoom',
+                    //     data: JSON.stringify({
+                    //         "token": $.cookie("access_Token"),
+                    //         "userId": $.cookie("account"),
+                    //         "sysId": "",
+                    //         "sign": sign,
+                    //         "time": time,
+                    //         "reqData": {"id": data.id}
+                    //     }),
+                    //     async: false,
+                    //     type: "POST",
+                    //     contentType: "application/json;charset=utf-8",
+                    //     dataType: 'JSON',
+                    //     success: function (res) {
+                    //         if (res.repCode == '0000') {
+                    //             obj.del();
+                    //             layer.msg("删除成功", {icon: 1});
+                    //         }
+                    //     }
+                    // });
+                });
+            }
+        });
+
+    });
+</script>
+</html>

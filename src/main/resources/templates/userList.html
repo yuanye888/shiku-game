@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+	<meta charset="UTF-8">
+	<title>视酷后台管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		  content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+	<link rel="stylesheet" href="./css/font.css">
+	<link rel="stylesheet" href="./css/xadmin.css">
+	<script src="./lib/layui/layui.js" charset="utf-8"></script>
+	<script type="text/javascript" src="./js/xadmin.js"></script>
+	<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<!--[if lt IE 9]>
+	<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a>首页</a>
+            <a><cite>机器人管理</cite></a>
+          </span>
+	<a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+	   onclick="location.reload()" title="刷新">
+		<i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+	<div id="blocks" class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-body ">
+					<form class="layui-form layui-col-space5">
+						<div class="layui-inline layui-show-xs-block">
+							<input type="text" name="name" id="toomName" placeholder="用户名称" autocomplete="off"
+								   class="layui-input">
+						</div>
+						<div class="layui-inline layui-show-xs-block">
+							<div class="layui-btn" lay-filter="button" id="do_search"><i
+									class="layui-icon">&#xe615;</i></div>
+						</div>
+					</form>
+				</div>
+				<div class="layui-card-header">
+					<!--<button class="layui-btn" onclick="xadmin.open('新建机器人','/room-add.html',600,300)"><i-->
+							<!--class="layui-icon"></i>新建机器人-->
+					<!--</button>-->
+					<button onclick="showTables()" class="layui-btn btn_addUser">新建机器人</button>
+				</div>
+				<div class="layui-card-body layui-table-body layui-table-main">
+					<table class="layui-hide" id="roomTable" lay-filter="demo"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 添加用户 -->
+	<div id="addUser" class="layui-col-md10" style="display: none">
+		<div id="addUserTitle" class="layui-card-header">新增机器人</div>
+
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label for="userName" class="layui-form-label">
+					<span class="x-red">*</span>用户昵称
+				</label>
+				<div class="layui-input-inline">
+                    <input id="userId" type="" name="userId" style="display: none">
+                    <input type="text" id="userName" name="userName" required="" lay-verify="name" autocomplete="off"
+						   class="layui-input">
+				</div>
+				<!--<div class="layui-form-mid layui-word-aux">-->
+					<!--<span class="x-red">*</span>请输入群组名称-->
+				<!--</div>-->
+			</div>
+			<div class="layui-form-item">
+				<label for="telephone" class="layui-form-label">
+					<span class="x-red">*</span>手机号码
+				</label>
+				<div class="layui-input-inline">
+					<input type="text" id="telephone" name="telephone" required="" lay-verify="telephone" autocomplete="off"
+						   class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+				<span class="x-red">*</span>请输入手机号
+			</div>
+			</div>
+
+			<!--<div class="layui-form-item">-->
+				<!--<label for="birthday" class="layui-form-label">-->
+					<!--<span class="x-red">*</span>出生日期-->
+				<!--</label>-->
+				<!--<div class="layui-input-inline">-->
+					<!--<input class="layui-input" id="birthday" name="birthday" placeholder="yyyy-MM-dd HH:mm:ss" type="text">-->
+			<!--</div>-->
+			<!--<div class="layui-form-mid layui-word-aux">-->
+					<!--<span class="x-red">*</span>请输入房间说明-->
+				<!--</div>-->
+			<!--</div>-->
+
+
+			<div class="layui-form-item">
+				<label for="sex" class="layui-form-label">
+					<span class="x-red">*</span>性别
+				</label>
+				<div class="layui-input-inline">
+					<select id="sex" name="sex" class="layui-select" style="width: 100%">
+						<option selected="selected" value="">请选择</option>
+						<option value="0">女</option>
+						<option value="1">男</option>
+					</select>
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+					<span class="x-red">*</span>请输入房间说明
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<!--<label for="L_desc" class="layui-form-label"></label>-->
+				<button class="layui-btn" lay-filter="add" lay-submit="">提交</button>
+				<button onclick="showBlocks()" class="layui-btn layui-btn-primary layui-btn-sm" style="">&lt;&lt;返回</button>
+			</div>
+		</form>
+	</div>
+</div>
+</body>
+<script type="text/html" id="barDemo">
+
+
+    <a class="layui-btn layui-btn-xs" lay-event="update">修改</a>
+    <a class="layui-btn layui-btn-xs" lay-event="recharge">充值</a>
+    <a class="layui-btn layui-btn-xs" lay-event="handCash">提现</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    layui.use(['form', 'layer', 'jquery'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer;
+
+            //自定义验证规则
+            form.verify({
+                name: function (value) {
+                    if (value.length < 1) {
+                        return '请填写用户名称';
+                    }
+                },
+                telephone: function (value) {
+                    if (value.length < 1) {
+                        return '请填写手机号';
+                    }
+                }
+            });
+
+            //监听提交
+            form.on('submit(add)',
+                function (data) {
+                    let time = parseInt(Math.round(new Date().getTime())) + parseInt($.cookie("currentTime"));
+                    time = parseInt(time / 1000);
+                    var sign = hex_md5($.cookie("apiKey") + time + $.cookie("account") + $.cookie("access_Token"));
+                    var sex=$("#sex").val();
+                    $.ajax({
+                        url: '/user/addRobot',
+                        type: 'post',
+                        dataType: 'json',
+                        contentType: "application/json",
+                        async: true,//异步请求
+                        cache: false,
+                        data: JSON.stringify({
+                            "token": $.cookie("access_Token"),
+                            "userId": $.cookie("account"),
+                            "sysId": "",
+                            "sign": sign,
+                            "time": time,
+                            "reqData": {
+                                "userId": data.field.userId,
+                                "userName": data.field.userName,
+                                "userId": data.field.userId,
+                                // "birthday": data.field.birthday,
+                                "sex": sex,
+                                "telephone": data.field.telephone
+                            }
+                        }),
+                        //执行成功的回调函数
+                        success: function (data) {
+                            if (data.repCode) {
+                                layer.alert("增加成功", {
+                                        icon: 6
+                                    },
+                                    function () {
+                                        //关闭当前frame
+                                        xadmin.close();
+                                        // table.reload("roomTable");
+                                        // // 可以对父窗口进行刷新
+                                        xadmin.father_reload();
+                                    });
+                            }
+                        },
+                        //执行失败或错误的回调函数
+                        error: function (data) {
+                            layer(data.repMsg, {icon: 5});
+                        }
+                    });
+
+                    return false;
+                });
+
+        });
+	function showTables (){
+	    var blocks = document.getElementById("blocks");
+	    var tables = document.getElementById("addUser");
+	    blocks.style.display = "none";
+	    tables.style.display = "block"
+	}
+    function showBlocks (){
+        var blocks = document.getElementById("blocks");
+        var tables = document.getElementById("addUser");
+        tables.style.display = "none";
+        blocks.style.display = "block"
+    }
+</script>
+<!-- 日期选择器 -->
+<script>
+    layui.use('laydate', function() {
+        var laydate = layui.laydate;
+        //日期时间选择器
+        laydate.render({
+            elem: '#birthday'
+            ,type: 'datetime'
+            ,max: 0 //最大时间
+        });
+    })
+
+</script>
+<script type="text/javascript" src="js/timeFormat.js"></script>
+<script src="js/md5.js" type="text/javascript"></script>
+<script type="text/javascript" src="pagejs/userList.js"></script>
+</html>
