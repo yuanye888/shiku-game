@@ -30,7 +30,7 @@ public class UserRepository {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public User selectUserById(String userId) {
+    public User selectUserById(Integer userId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(userId));
         return mongoTemplate.findOne(query, User.class);

@@ -59,7 +59,7 @@ public class UserController {
     public BaseResponseModel selectUserById(@RequestBody BaseRequestModel request) {
         log.info("------------------------------------分页查询机器人列表开始------------------------------------");
         BaseResponseModel response = new BaseResponseModel();
-        User user = userRepository.selectUserById(request.getReqData().getString("userId"));
+        User user = userRepository.selectUserById(Integer.valueOf(request.getReqData().getString("userId")));
         if (user != null) {
             response.setRepCode(RespCode.SUCCESS);
             response.setRepMsg(RespMsg.SUCCESS_MSG);

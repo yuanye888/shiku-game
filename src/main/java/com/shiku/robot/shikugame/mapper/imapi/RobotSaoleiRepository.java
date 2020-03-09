@@ -46,7 +46,7 @@ public class RobotSaoleiRepository {
         List<ShikuRobotSaoLei> list = page.getData();
         for (ShikuRobotSaoLei sr:list
         ) {
-            User user = userRepository.selectUserById(sr.getUserId());
+            User user = userRepository.selectUserById(Integer.valueOf(sr.getUserId()));
             sr.setUserName(user.getNickname());
         }
         return page;
